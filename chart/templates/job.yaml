@@ -1,0 +1,58 @@
+---
+apiVersion: batch/v1
+kind: Job
+metadata:
+  name: {{ .Release.Name }}
+spec:
+  template:
+    metadata:
+      name: {{ .Release.Name }}
+      labels:
+        app: {{ .Release.Name }}-deployment
+      annotations:
+        pod.alpha.kubernetes.io/initialized: "true"
+        kube2iam.beta.domain.net/role: {{ .Values.aws.role }}
+    spec:
+      restartPolicy: OnFailure
+      containers:
+        - name: go
+          image: {{ .Values.pod.image }}
+          imagePullPolicy: Always
+          args: ["{{ .Values.QUERY_ID }}"]
+          env:
+            - name: ENVIRONMENT
+              value: "{{ .Values.global.env }}"
+            - name: REPO_TYPE
+              value: "{{ .Values.global.repo_type }}"
+            - name: DB_TABLE_PREFIX
+              value: "{{ .Values.global.db_table_prefix }}"
+            - name: JOB_SLEEP_IDLE_S
+              value: "{{ .Values.job.sleep_idle_s }}"
+            - name: JOB_ERROR_RETRY_INTERVAL_S
+              value: "{{ .Values.job.error_retry_interval_s }}"
+            - name: JOB_METRICS_SAMPLE_WINDOW_S
+              value: "{{ .Values.job.metrics.sample.window_s }}"
+            - name: JOB_PROGRESS_UPDATE_OFFSET_WINDOWS
+              value: "{{ .Values.job.progress_update_offset_windows }}"
+            - name: JOB_REST_BETWEEN_WRITES_MS
+              value: "{{ .Values.job.rest_between_writes_ms }}"
+            - name: INFLUXDB_SRC_URL
+              value: "{{ .Values.influxdb.src.url }}"
+            - name: INFLUXDB_SRC_USERNAME
+              value: "{{ .Values.influxdb.src.username }}"
+            - name: INFLUXDB_SRC_PASSWORD
+              value: "{{ .Values.influxdb.src.password }}"
+            - name: INFLUXDB_DEST_URL
+              value: "{{ .Values.influxdb.dest.url }}"
+            - name: INFLUXDB_DEST_USERNAME
+              value: "{{ .Values.influxdb.dest.username }}"
+            - name: INFLUXDB_DEST_PASSWORD
+              value: "{{ .Values.influxdb.dest.password }}"
+            - name: METRICS_HOST
+              value : "{{ .Values.metrics.host }}"
+            - name: METRICS_DATABASE
+              value : "{{ .Values.metrics.database }}"
+            - name: METRICS_USERNAME
+              value : "{{ .Values.metrics.username }}"
+            - name: METRICS_PASSWORD
+              value : "{{ .Values.metrics.password }}"

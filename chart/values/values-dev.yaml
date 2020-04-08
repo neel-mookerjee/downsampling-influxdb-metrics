@@ -1,0 +1,35 @@
+global:
+  env: dev
+  db_table_prefix: ""
+  repo_type: DB
+
+pod:
+  image: 12345678901.dkr.ecr.us-west-2.amazonaws.com/metrics-downsampling-job:latest
+
+job:
+  sleep_idle_s: 30
+  error_retry_interval_s: 10
+  progress_update_offset_windows: 24
+  rest_between_writes_ms: 100
+  metrics:
+    sample:
+      window_s: 3600
+
+influxdb:
+  src:
+    url: http://influxdb.r53.domain.net:8086/Query
+    username: anonymous
+    password: anonymous
+  dest:
+    url: http://influxdb.r53.domain.net:8086/Query
+    username: anonymous
+    password: anonymous
+
+aws:
+  role: arn:aws:iam::12345678901:role/testns/k8s/platform
+
+metrics:
+  host: http://influxdb.r53.domain.net:8086
+  database: test
+  username: admin
+  password: admin
